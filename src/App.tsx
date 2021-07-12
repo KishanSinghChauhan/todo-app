@@ -1,24 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import  React,{ ChangeEvent, useState } from 'react';
+import Input from './components/Input';
+import TodoList from './components/TodoList';
 
-function App() {
+export interface ITodo  {
+  title:string,
+  deadLine:string,
+  id:string 
+}
+
+
+const App:React.FC = () => {
+  const [todo, setTodo] = useState<ITodo>({title:'',deadLine:'', id:''})
+  const [todoList, setTodoList] = useState<ITodo[]>([])
+
+  const handleChange = (e:ChangeEvent<HTMLInputElement>):void  => {
+    const {name,value} = e.target
+    setTodo({
+      ...todo,
+      [name]:value,
+    })
+  } 
+
+  const addtask = ():void => {
+    setTodoList([...todoList, todo]);
+    setTodo({
+      title:'',
+      deadLine:'',
+      id:String(Math.random())
+    })
+  }
+
+  const deleteTask = (todoId:string):void => {
+    const afterDeleteTodoList = todoList.filter(d => d.id !== todoId )
+    setTodoList(afterDeleteTodoList)
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='container'>
+      <Input handleChange={handleChange} addTask={addtask} todo={todo}/>
+      <div>
+        {todoList?.map((info:ITodo) => (
+          <TodoList key={info.id} data={info} onDelete={deleteTask} />
+        ))}
+      </div>
     </div>
   );
 }
